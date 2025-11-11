@@ -1,5 +1,6 @@
 const Usuario = require('../models/usuario.js');
 const bcrypt = require('bcryptjs'); // Importar bcrypt para hashear contraseñas
+const mongoose = require('mongoose');
 
 class UsuarioController {
   async crearUsuario(req, res) { // Crear un nuevo usuario

@@ -8,9 +8,10 @@ class ChequeoService {
     this.turnoRepository = turnoRepository;
   } // Inyección de dependencias, facilita testing y mantenimiento, permite cambiar repositorios sin modificar la lógica de negocio
   
-  async realizarChequeo(datosChequeo) { // datosChequeo incluye: turno, vehiculo, y las 8 puntuaciones
-    try { // Verificar que el turno existe y está confirmado
-      const turno = await this.turnoRepository.obtenerPorId(datosChequeo.turno); // esto hace que el turno exista y esté confirmado 
+  async realizarChequeo(datosChequeo) {
+    try {
+      // Verificar que el turno existe y está confirmado
+      const turno = await this.turnoRepository.obtenerPorId(datosChequeo.turno);
       if (!turno) {
         throw new Error('Turno no encontrado');
       }
@@ -19,22 +20,18 @@ class ChequeoService {
         throw new Error('El turno debe estar confirmado para realizar el chequeo');
       }
       
-      const chequeoExistente = await this.chequeoRepository.obtenerPorTurno(datosChequeo.turno); // Verificar que no exista un chequeo previo para el mismo turno
+      // Verificar que no exista un chequeo previo para el mismo turno
+      const chequeoExistente = await this.chequeoRepository.obtenerPorTurno(datosChequeo.turno);
       if (chequeoExistente) {
         throw new Error('Ya existe un chequeo para este turno');
       }
       
-      const datosChequeoCompleto = { // Calcular puntuación total, resultado y observaciones automáticas
-        datosChequeo, 
-        fecha_chequeo: new Date() // Fecha actual
-      };
+      const chequeo = await this.chequeoRepository.crear(datosChequeo);
       
-    const chequeo = await this.chequeoRepository.crear(datosChequeoCompleto); // Crear el chequeo en la base de datos
-      
-      return chequeo; // Retornar el chequeo creado
+      return chequeo;
       
     } catch (error) {
-      throw new Error(`Error al realizar chequeo: ${error.message}`); // Manejo de errores
+      throw new Error(`Error al realizar chequeo: ${error.message}`);
     }
   }
   

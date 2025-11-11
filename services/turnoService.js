@@ -6,6 +6,14 @@ class TurnoService {
   constructor(turnoRepository) {
     this.turnoRepository = turnoRepository;
   }
+
+  async listarTurnos(filtros = {}) {
+    try {
+      return await this.turnoRepository.listar(filtros);
+    } catch (error) {
+      throw new Error(`Error al listar turnos: ${error.message}`);
+    }
+  }
   
   async solicitarTurno(datosTurno) { // datosTurno: { fecha, vehiculo_id, servicio }
     try {
@@ -32,9 +40,9 @@ class TurnoService {
     } 
   }
   
-  async confirmarTurno(turnoId) { // Confirmar un turno existente
+  async confirmarTurno(turnoId) {
     try {
-      const turno = await this.turnoRepository.obtenerPorId(turnoId); // Obtener el turno por ID
+      const turno = await this.turnoRepository.obtenerPorId(turnoId);
       if (!turno) {
         throw new Error('Turno no encontrado');
       }
@@ -43,21 +51,23 @@ class TurnoService {
         throw new Error('El turno no puede ser confirmado en su estado actual');
       }
       
-      const actualizado = await this.turnoRepository.actualizarEstado(turnoId, 'Confirmado'); // Actualizar estado a CONFIRMADO
+      const actualizado = await this.turnoRepository.actualizarEstado(turnoId, 'Confirmado');
       if (!actualizado) {
         throw new Error('Error al confirmar el turno');
       }
       
-      return { turno, estado: 'Confirmado' }; // Retornar el turno confirmado
+      return { turno: actualizado, estado: 'Confirmado' };
       
     } catch (error) {
-      throw new Error(`Error al confirmar turno: ${error.message}`); // Manejo de errores
+      throw new Error(`Error al confirmar turno: ${error.message}`);
     }
   }
   
-  async cancelarTurno(turnoId) { // Cancelar un turno existente
+  async cancelarTurno(turnoId) {
     try {
-      const turno = await this.turnoRepository.obtenerPorId(turnoId); // Obtener el turno por ID
+      console.log('Cancelando turno con ID:', turnoId, 'Tipo:', typeof turnoId);
+      
+      const turno = await this.turnoRepository.obtenerPorId(turnoId);
       if (!turno) {
         throw new Error('Turno no encontrado');
       }
@@ -66,15 +76,15 @@ class TurnoService {
         throw new Error('El turno no puede ser cancelado en su estado actual');
       }
       
-      const actualizado = await this.turnoRepository.actualizarEstado(turnoId, 'Cancelado'); // Actualizar estado a CANCELADO
+      const actualizado = await this.turnoRepository.actualizarEstado(turnoId, 'Cancelado');
       if (!actualizado) {
         throw new Error('Error al cancelar el turno');
       }
       
-      return { turno, estado: 'Cancelado' }; // Retornar el turno cancelado
+      return { turno: actualizado, estado: 'Cancelado' };
       
     } catch (error) {
-      throw new Error(`Error al cancelar turno: ${error.message}`); // Manejo de errores
+      throw new Error(`Error al cancelar turno: ${error.message}`);
     }
   }
   
@@ -86,22 +96,53 @@ class TurnoService {
     }
   }
   
-  async obtenerTurnosPorVehiculo(vehiculoId) { // Obtener turnos asociados a un vehículo
+  async obtenerTurnosPorVehiculo(vehiculoId) {
     try {
-      const objectId = new mongoose.Types.ObjectId(vehiculoId.toString());
-      return await this.turnoRepository.obtenerPorVehiculo(vehiculoId); // Obtener turnos por vehículo
+      console.log('Buscando turnos para vehiculoId:', vehiculoId, 'Tipo:', typeof vehiculoId);
+      
+      let resultado;
+      
+      if (mongoose.Types.ObjectId.isValid(vehiculoId)) {
+        // Es un ObjectId válido (24 caracteres hex)
+        const objectId = new mongoose.Types.ObjectId(vehiculoId);
+        resultado = await this.turnoRepository.obtenerPorVehiculo(objectId);
+      } else if (!isNaN(vehiculoId)) {
+        // Es un número - buscar vehículo por algún campo numérico
+        resultado = await this.buscarTurnosPorIdNumerico(vehiculoId);
+      } else {
+        throw new Error('ID de vehículo no válido. Debe ser ObjectId (24 caracteres) o número.');
+      }
+      
+      return resultado;
     } catch (error) {
-      throw new Error(`Error al obtener turnos del vehículo: ${error.message}`); // Manejo de errores
+      throw new Error(`Error al obtener turnos del vehículo: ${error.message}`);
     }
   }
   
-  async obtenerTurnoPorId(id) { // Obtener un turno por su ID
+  async obtenerTurnoPorId(id) {
     try {
-      const objectId = new mongoose.Types.ObjectId(id.toString());
-      return await this.turnoRepository.obtenerPorId(id); // Obtener turno por ID
+      let resultado;
+      
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        const objectId = new mongoose.Types.ObjectId(id);
+        resultado = await this.turnoRepository.obtenerPorId(objectId);
+      } else {
+        throw new Error('ID de turno no válido');
+      }
+      
+      if (!resultado) {
+        throw new Error('Turno no encontrado');
+      }
+      
+      return resultado;
     } catch (error) {
-      throw new Error(`Error al obtener turno: ${error.message}`); // Manejo de errores
+      throw new Error(`Error al obtener turno: ${error.message}`);
     }
+  }
+
+  async buscarTurnosPorIdNumerico(idNumerico) {
+    // Implementar lógica si necesitas buscar por ID numérico
+    throw new Error('Búsqueda por ID numérico no implementada');
   }
 }
 

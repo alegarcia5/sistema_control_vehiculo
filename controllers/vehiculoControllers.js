@@ -1,5 +1,6 @@
 const Vehiculo = require('../models/vehiculo.js');
 const Usuario = require('../models/usuario.js');
+const mongoose = require('mongoose');
 
 class VehiculoController { // Controlador para manejar las rutas de vehículos
   async crearVehiculo(req, res) { // Crea un nuevo vehículo

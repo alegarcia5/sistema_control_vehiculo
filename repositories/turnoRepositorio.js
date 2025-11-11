@@ -8,8 +8,14 @@ class turnoRepositorio {
   }
 
   async obtenerPorId(id) {
-    if (!mongoose.Types.ObjectId.isValid(id)) return null;
-    return await Turno.findById(id).populate('vehiculo');
+    // Asegurarse de que el ID sea un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log('ID no válido:', id);
+      return null;
+    }
+    
+    const objectId = new mongoose.Types.ObjectId(id);
+    return await Turno.findById(objectId).populate('vehiculo');
   }
 
   async obtenerPorVehiculo(vehiculoId) {
@@ -34,12 +40,18 @@ class turnoRepositorio {
   }
 
   async actualizarEstado(id, nuevoEstado, motivoCancelacion = null) {
-    const updateData = { estado: nuevoEstado };
-    if (nuevoEstado === 'Cancelado' && motivoCancelacion) {
-      updateData.motivo_cancelacion = motivoCancelacion;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error('ID de turno no válido');
     }
     
-    return await Turno.findByIdAndUpdate(id, updateData, { 
+    const objectId = new mongoose.Types.ObjectId(id);
+    const updateData = { estado: nuevoEstado };
+    
+    if (nuevoEstado === 'Cancelado' && motivoCancelacion) {
+      updateData.motivoCancelacion = motivoCancelacion;
+    }
+    
+    return await Turno.findByIdAndUpdate(objectId, updateData, { 
       new: true, 
       runValidators: true 
     }).populate('vehiculo');

@@ -8,12 +8,20 @@ class dbClient { // Clase que representa el cliente de la base de datos
     }
 
     async conectarBD(){  // Método asincrónico para conectar a la base de datos
-        // Cadena de conexión a la base de datos MongoDB usando variables de entorno almacenadas en un archivo .env
-        const queryString = `mongodb+srv://${process.env.USER_DB}:${process.env.PASS_DB}@${process.env.SERVER_DB}/?retryWrites=true&w=majority`; 
+        try{// Cadena de conexión a la base de datos MongoDB usando variables de entorno almacenadas en un archivo .env
+            const queryString = `mongodb+srv://${process.env.USER_DB}:${process.env.PASS_DB}@${process.env.SERVER_DB}/?retryWrites=true&w=majority`; 
         
-        await mongoose.connect(queryString) // Conecto a la base de datos usando mongoose
+            await mongoose.connect(queryString, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                dbName: process.env.DB_NAME || 'sistema_control_vehiculo' // Agregar nombre de BD
+            });
 
-        console.log("Conectado a la base de datos"); // Mensaje de éxito al conectar a la base de datos
+            console.log("Conectado a la base de datos"); // Mensaje de éxito al conectar a la base de datos
+        } catch (error) {
+            console.error("Error al conectar a la base de datos:", error);
+            process.exit(1); // Salir si no puede conectar
+        }
     }
 
     async desconectarBD(){ // Método asincrónico para desconectar de la base de datos

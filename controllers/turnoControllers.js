@@ -1,5 +1,6 @@
 const TurnoService = require('../services/turnoService.js');
 const TurnoRepository = require('../repositories/turnoRepositorio.js');
+const mongoose = require('mongoose');
 
 // Inyección de dependencias
 const turnoRepository = new TurnoRepository();
@@ -39,19 +40,19 @@ class TurnoController {
     }
   }
   
-  async confirmarTurno(req, res) { // PUT /turnos/:id/confirmar
+  async confirmarTurno(req, res) {
     try {
-      const { id } = req.params; // Obtener ID del turno de los parámetros
+      const { id } = req.params;
       
-      const turno = await turnoService.confirmarTurno(parseInt(id)); // Llamar al servicio para confirmar el turno
+      const turno = await turnoService.confirmarTurno(id);
       
-      res.json({ // Responder con éxito
+      res.json({
         success: true,
         message: 'Turno confirmado exitosamente',
         data: turno
       });
       
-    } catch (error) { // Manejo de errores
+    } catch (error) {
       res.status(400).json({
         success: false,
         message: error.message
@@ -59,19 +60,19 @@ class TurnoController {
     }
   }
   
-  async cancelarTurno(req, res) { // DELETE /turnos/:id
+  async cancelarTurno(req, res) {
     try {
-      const { id } = req.params; // Obtener ID del turno de los parámetros
+      const { id } = req.params;
       
-      const turno = await turnoService.cancelarTurno(parseInt(id)); // Llamar al servicio para cancelar el turno
+      const turno = await turnoService.cancelarTurno(id);
       
-      res.json({ // Responder con éxito
+      res.json({
         success: true,
         message: 'Turno cancelado exitosamente',
         data: turno
       });
       
-    } catch (error) { // Manejo de errores
+    } catch (error) {
       res.status(400).json({
         success: false,
         message: error.message
@@ -129,19 +130,19 @@ class TurnoController {
     }
   }
   
-  async obtenerTurnosPorVehiculo(req, res) { // GET /turnos/vehiculo/:vehiculoId
+  async obtenerTurnosPorVehiculo(req, res) {
     try {
-      const { vehiculoId } = req.params; // Obtener ID del vehículo de los parámetros
+      const { vehiculoId } = req.params;
       
-      const turnos = await turnoService.obtenerTurnosPorVehiculo(parseInt(vehiculoId)); // Llamar al servicio para obtener turnos del vehículo
+      const turnos = await turnoService.obtenerTurnosPorVehiculo(vehiculoId);
       
-      res.json({ // Responder con éxito
+      res.json({
         success: true,
         count: turnos.length,
         data: turnos
       });
       
-    } catch (error) { // Manejo de errores
+    } catch (error) {
       res.status(500).json({
         success: false,
         message: error.message
@@ -149,25 +150,26 @@ class TurnoController {
     }
   }
   
-  async obtenerTurno(req, res) { // GET /turnos/:id
+  async obtenerTurno(req, res) {
     try {
-      const { id } = req.params; // Obtener ID del turno de los parámetros
+      const { id } = req.params;
       
-      const turno = await turnoService.obtenerTurnoPorId(parseInt(id)); // Llamar al servicio para obtener el turno por ID
+      // Usar el servicio correctamente
+      const turno = await turnoService.obtenerTurnoPorId(id);
       
-      if (!turno) { // Si no se encuentra el turno
+      if (!turno) {
         return res.status(404).json({
           success: false,
           message: 'Turno no encontrado'
         });
       }
       
-      res.json({ // Responder con éxito
+      res.json({
         success: true,
         data: turno
       });
       
-    } catch (error) { // Manejo de errores
+    } catch (error) {
       res.status(500).json({
         success: false,
         message: error.message
@@ -190,8 +192,8 @@ class TurnoController {
         });
       }
       
-      // Obtener turnos del vehículo
-      const turnos = await this.turnoService.obtenerTurnosPorVehiculo(vehiculo._id);
+      // Obtener turnos del vehículo usando el servicio
+      const turnos = await turnoService.obtenerTurnosPorVehiculo(vehiculo._id.toString());
       
       res.json({
         success: true,
@@ -217,10 +219,18 @@ class TurnoController {
   async confirmarTurnoUsuario(req, res) {
     try {
       const { id } = req.params;
-      const { matricula } = req.body; // Matrícula para validación
+      const { matricula } = req.body;
       
-      // Validar que el turno pertenece al vehículo con esa matrícula
-      const turno = await this.turnoService.obtenerTurnoPorId(id);
+      // VALIDAR QUE matricula EXISTA
+      if (!matricula) {
+        return res.status(400).json({
+          success: false,
+          message: 'La matrícula es requerida en el cuerpo de la solicitud'
+        });
+      }
+
+      // Validar que el turno existe
+      const turno = await turnoService.obtenerTurnoPorId(id);
       if (!turno) {
         return res.status(404).json({
           success: false,
@@ -228,17 +238,26 @@ class TurnoController {
         });
       }
       
+      // Buscar el vehículo del turno
       const Vehiculo = mongoose.model('Vehiculo');
       const vehiculo = await Vehiculo.findById(turno.vehiculo);
       
-      if (!vehiculo || vehiculo.matricula !== matricula.toUpperCase()) {
+      if (!vehiculo) {
+        return res.status(404).json({
+          success: false,
+          message: 'Vehículo no encontrado para este turno'
+        });
+      }
+
+      if (vehiculo.matricula !== matricula.toUpperCase()) {
         return res.status(400).json({
           success: false,
           message: 'La matrícula no coincide con el vehículo del turno'
         });
       }
       
-      const turnoConfirmado = await this.turnoService.confirmarTurno(id);
+      // Confirmar el turno
+      const turnoConfirmado = await turnoService.confirmarTurno(id);
       
       res.json({
         success: true,
