@@ -1,5 +1,6 @@
 const ChequeoRepository = require('../repositories/chequeoRepositorio.js');
 const TurnoRepository = require('../repositories/turnoRepositorio.js');
+const mongoose = require('mongoose');
 
 class ChequeoService { 
   constructor(chequeoRepository, turnoRepository) {

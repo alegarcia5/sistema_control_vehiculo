@@ -1,5 +1,6 @@
 const TurnoRepository = require('../repositories/turnoRepositorio.js');
 const Vehiculo = require('../models/vehiculo.js');
+const mongoose = require('mongoose');
 
 class TurnoService {
   constructor(turnoRepository) {
@@ -87,6 +88,7 @@ class TurnoService {
   
   async obtenerTurnosPorVehiculo(vehiculoId) { // Obtener turnos asociados a un vehículo
     try {
+      const objectId = new mongoose.Types.ObjectId(vehiculoId.toString());
       return await this.turnoRepository.obtenerPorVehiculo(vehiculoId); // Obtener turnos por vehículo
     } catch (error) {
       throw new Error(`Error al obtener turnos del vehículo: ${error.message}`); // Manejo de errores
@@ -95,6 +97,7 @@ class TurnoService {
   
   async obtenerTurnoPorId(id) { // Obtener un turno por su ID
     try {
+      const objectId = new mongoose.Types.ObjectId(id.toString());
       return await this.turnoRepository.obtenerPorId(id); // Obtener turno por ID
     } catch (error) {
       throw new Error(`Error al obtener turno: ${error.message}`); // Manejo de errores
