@@ -1,0 +1,36 @@
+**USUARIOS**
+* crear usuario: POST http://localhost:5100/api/usuarios *
+* obtener todos los usuarios: GET http://localhost:5100/api/usuarios *
+* obtener todos los tecnicos: GET http://localhost:5100/api/usuarios/tecnicos *
+* obtener todos los dueños: GET http://localhost:5100/api/usuarios/dueños *
+* obtener usuario por id: GET http://localhost:5100/api/usuarios/:id *
+* actualizar usuario: PUT http://localhost:5100/api/usuarios/:id *
+* eliminar usuario: DELETE http://localhost:5100/api/usuarios/:id *
+
+**VEHICULOS**
+*crear vehiculo: POST http://localhost:5100/api/vehiculos*
+*obtener todos los vehiculos: GET http://localhost:5100/api/vehiculos*
+*obtener vehiculo por id: GET http://localhost:5100/api/vehiculos/:id*
+*obtener vehiculo por matricula: GET http://localhost:5100/api/vehiculos/matricula/:matricula*
+*actualizar vehiculo: PUT http://localhost:5100/api/vehiculos/:id*
+*eliminar vehiculo: DELETE http://localhost:5100/api/vehiculos/:id*
+
+**TURNOS**
+*solicitar turno: POST http://localhost:5100/api/turnos*
+*obtener todos los turnos: GET http://localhost:5100/api/turnos*
+*obtener todos los turnos disponibles: GET http://localhost:5100/api/turnos/disponibles*
+*obtener turno por id de vehiculo: GET http://localhost:5100/api/turnos/vehiculo/:vehiculo*
+*obtener turno por id: GET http://localhost:5100/api/turnos/:id*
+*obtener turno por matricula: GET http://localhost:5100/api/turnos/matricula/:matricula*
+*confirmar turno por usuario: PUT http://localhost:5100/api/turnos/:id/confirmar-usuario  body: {"matricula": ":matricula"}*
+*confirmar turno: PUT http://localhost:5100/api/turnos/:id/confirmar*
+*cancelar turno: PUT http://localhost:5100/api/turnos/:id/cancelar*
+
+**CHEQUEOS**
+*realizar chequeo: POST http://localhost:5100/api/chequeos*
+*calcular resultado: POST http://localhost:5100/api/chequeos/calcular  body: {"puntuaciones": [3, 4, 2, 5, 3, 4, 2, 3]}*
+*obtener todos los chequeos: GET http://localhost:5100/api/chequeos*
+*obtener chequeo por id: GET http://localhost:5100/api/chequeos/:id*
+*obtener chequeo por vehiculo: GET http://localhost:5100/api/chequeos/vehiculo/:vehiculo*
+*actualizar chequeo: PUT http://localhost:5100/api/chequeos/:id  body:{"puntuaciones": [9, 8, 9, 7, 9, 8, 9, 9],
+  "observaciones_generales": "Después de las reparaciones, vehículo en excelente estado"}*
