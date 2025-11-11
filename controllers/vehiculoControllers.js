@@ -1,5 +1,5 @@
-import Vehiculo from './models/vehiculo.js';
-import Usuario from './models/usuario.js';
+const Vehiculo = require('../models/vehiculo.js');
+const Usuario = require('../models/usuario.js');
 
 class VehiculoController { // Controlador para manejar las rutas de vehículos
   async crearVehiculo(req, res) { // Crea un nuevo vehículo
@@ -239,4 +239,4 @@ class VehiculoController { // Controlador para manejar las rutas de vehículos
   }
 }
 
-export default new VehiculoController(); // Exportar una instancia del controlador
+module.exports = new VehiculoController(); // Exportar una instancia del controlador

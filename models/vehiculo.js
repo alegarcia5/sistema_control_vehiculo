@@ -1,4 +1,4 @@
-import mongoose from "mongoose"; // Importo mongoose para definir el esquema y modelo de la colección de vehiculos
+const mongoose = require("mongoose"); // Importo mongoose para definir el esquema y modelo de la colección de vehiculos
 
 const vehiculoSchema = new mongoose.Schema( // Defino el esquema de la colección de vehiculos
     {
@@ -21,24 +21,11 @@ const vehiculoSchema = new mongoose.Schema( // Defino el esquema de la colecció
     dueño: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Usuario', 
-        required: true,
-        validate: {
-            validator: async function(value) { // Validador personalizado para verificar que el usuario existe y tiene rol 'DUEÑO'
-                const Usuario = mongoose.model('Usuario'); // Obtengo el modelo de Usuario
-                const usuario = await Usuario.findById(value); // Busco el usuario por su ID
-                return usuario && usuario.rol === 'Dueño'; // Retorno true si el usuario existe y su rol es 'DUEÑO'
-            },
-            message: 'El dueño debe ser un usuario con rol Dueño'
-        }
-    }, // Campo 'dueño' que referencia al ID de un documento en la colección 'Usuario', requerido
+        required: true
+    },
     },
     { Timestamps: true } // Los Habilito para que mongoose agregue automáticamente los campos 'createdAt' y 'updatedAt', para segumiento de cambios
 );
-
-vehiculoSchema.index({ matricula: 1 }); // Creo un índice en el campo 'matricula' para mejorar el rendimiento de las consultas que lo utilicen
-vehiculoSchema.index({ dueño: 1 }); // Creo un índice en el campo 'dueño' para mejorar el rendimiento de las consultas que lo utilicen
-vehiculoSchema.index({ marca: 1 }); // Creo un índice en el campo 'marca' para mejorar el rendimiento de las consultas que lo utilicen
-vehiculoSchema.index({ modelo: 1 }); // Creo un índice en el campo 'modelo' para mejorar el rendimiento de las consultas que lo utilicen
 
 // Middleware para validaciones antes de guardar
 vehiculoSchema.pre('save', function(next) { // Antes de guardar el vehículo
@@ -57,7 +44,5 @@ vehiculoSchema.methods.toJSON = function() { // Defino un método toJSON en el e
 };
 // Defino un método toJSON en el esquema para personalizar la conversión a JSON, eliminando los campos _id y __v, y agregando un campo 'id' con el valor de '_id'
 
-export default mongoose.model("Vehiculo", vehiculoSchema); 
+module.exports = mongoose.model("Vehiculo", vehiculoSchema); 
 // Exporto el modelo de la colección de vehiculos, que se llamará "Vehiculo" y usará el esquema definido anteriormente
-
-

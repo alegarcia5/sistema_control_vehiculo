@@ -1,6 +1,6 @@
-import 'dotenv/config'; // Importo las variables de entorno desde el archivo .env para poder usarlas en la conexión a la base de datos
+require('dotenv').config(); // Importo las variables de entorno desde el archivo .env para poder usarlas en la conexión a la base de datos
 
-import mongoose from "mongoose"; // Importo mongoose para manejar la conexión y esquemas de MongoDB
+const mongoose = require("mongoose"); // Importo mongoose para manejar la conexión y esquemas de MongoDB
 
 class dbClient { // Clase que representa el cliente de la base de datos
     constructor(){
@@ -27,4 +27,4 @@ class dbClient { // Clase que representa el cliente de la base de datos
 
 }
 
-export default new dbClient(); // Exporto una nueva instancia de dbClient para que pueda ser utilizada en otras partes de la aplicación
+module.exports = new dbClient(); // Exporto una nueva instancia de dbClient para que pueda ser utilizada en otras partes de la aplicació

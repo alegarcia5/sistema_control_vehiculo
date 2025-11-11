@@ -1,6 +1,6 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import chequeoController from './controllers/chequeoControllers.js';
+const chequeoController = require('../controllers/chequeoControllers.js');
 
 // GET /api/chequeos - Listar todos los chequeos (con filtros opcionales)
 router.get('/', chequeoController.listarChequeos);
@@ -20,4 +20,4 @@ router.post('/calcular', chequeoController.calcularResultado);
 // PUT /api/chequeos/:id - Actualizar chequeo
 router.put('/:id', chequeoController.actualizarChequeo);
 
-export default router;
+module.exports = router;

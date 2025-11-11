@@ -1,5 +1,5 @@
-import ChequeoRepository from './repositories/chequeoRepositorio.js';
-import TurnoRepository from './repositories/turnoRepositorio.js';
+const ChequeoRepository = require('../repositories/chequeoRepositorio.js');
+const TurnoRepository = require('../repositories/turnoRepositorio.js');
 
 class ChequeoService { 
   constructor(chequeoRepository, turnoRepository) {
@@ -93,7 +93,7 @@ class ChequeoService {
   
   determinarResultado(puntuaciones) { // Determinar el resultado del chequeo basado en las reglas definidas
     const total = this.calcularPuntuacionTotal(puntuaciones); // Calcular la puntuación total
-    const minPuntuacion = Math.min(puntuaciones); // Encontrar la puntuación mínima
+    const minPuntuacion = Math.min(...puntuaciones); // Encontrar la puntuación mínima
     
     if (total >= 80) {
       return 'Aprobado';
@@ -106,7 +106,7 @@ class ChequeoService {
   
   generarObservacionesAutomaticas(puntuaciones, resultado) { // Generar observaciones automáticas basadas en las puntuaciones y el resultado
     const total = this.calcularPuntuacionTotal(puntuaciones); // Calcular la puntuación total
-    const minPuntuacion = Math.min(puntuaciones); // Encontrar la puntuación mínima
+    const minPuntuacion = Math.min(...puntuaciones); // Encontrar la puntuación mínima
     
     if (resultado === 'Rechequeo') {
       if (total < 40) {
@@ -127,4 +127,4 @@ class ChequeoService {
   }
 }
 
-export default ChequeoService; // exportar la clase para su uso en otras partes de la aplicación
+module.exports = ChequeoService; // exportar la clase para su uso en otras partes de la aplicación

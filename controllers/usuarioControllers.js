@@ -1,5 +1,5 @@
-import Usuario from './models/usuario.js';
-import bcrypt from 'bcryptjs'; // Importar bcrypt para hashear contraseñas
+const Usuario = require('../models/usuario.js');
+const bcrypt = require('bcryptjs'); // Importar bcrypt para hashear contraseñas
 
 class UsuarioController {
   async crearUsuario(req, res) { // Crear un nuevo usuario
@@ -206,4 +206,4 @@ class UsuarioController {
   }
 }
 
-export default new UsuarioController(); // Exportar una instancia del controlador
+module.exports = new UsuarioController(); // Exportar una instancia del controlador

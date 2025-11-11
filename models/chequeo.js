@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'; // Importo mongoose para definir el esquema y modelo de la colección de chequeos
+const mongoose = require('mongoose'); // Importo mongoose para definir el esquema y modelo de la colección de chequeos
 
 const puntoChequeoSchema = new mongoose.Schema({ // Subesquema para los puntos de chequeo
   nombre: {
@@ -28,28 +28,12 @@ const chequeoSchema = new mongoose.Schema({ // Defino el esquema de la colecció
     ref: 'Turno',
     required: [true],
     unique: true,
-    validate: {
-      validator: async function(turnoId) { // Validador personalizado para verificar que el turno existe y está confirmado
-        const Turno = mongoose.model('Turno'); // Obtengo el modelo de Turno
-        const turno = await Turno.findById(turnoId); // Busco el turno por su ID
-        return turno && turno.estado === 'Confirmado'; // Retorno true si el turno existe y su estado es 'Confirmado'
-      },
-      message: 'El turno debe existir y estar confirmado'
-    } // Campo 'turno' que referencia al ID de un documento en la colección 'Turno', requerido, único (un chequeo por turno)
   },
 
   tecnico: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
-    required: [true, 'El técnico es requerido'],
-    validate: {
-      validator: async function(tecnicoId) { // Validador personalizado para verificar que el usuario existe y tiene rol 'Tecnico'
-        const Usuario = mongoose.model('Usuario'); // Obtengo el modelo de Usuario
-        const usuario = await Usuario.findById(tecnicoId); // Busco el usuario por su ID
-        return usuario && usuario.rol === 'Tecnico'; // Retorno true si el usuario existe y su rol es 'Tecnico'
-      },
-      message: 'El técnico debe ser un usuario con rol Tecnico'
-    } // Campo 'tecnico' que referencia al ID de un documento en la colección 'Usuario', requerido
+    required: [true]
   },
 
   puntuacion: [{
@@ -116,11 +100,6 @@ const chequeoSchema = new mongoose.Schema({ // Defino el esquema de la colecció
   }
 });
 
-chequeoSchema.index({ turno: 1 }); // Creo un índice en el campo 'turno' para mejorar el rendimiento de las consultas que lo utilicen
-chequeoSchema.index({ tecnico: 1 }); // Creo un índice en el campo 'tecnico' para mejorar el rendimiento de las consultas que lo utilicen
-chequeoSchema.index({ resultado: 1 }); // Creo un índice en el campo 'resultado' para mejorar el rendimiento de las consultas que lo utilicen
-chequeoSchema.index({ fecha_chequeo: -1 }); // Creo un índice en el campo 'fecha_chequeo' para mejorar el rendimiento de las consultas que lo utilicen
-
 // Middleware para cálculos automáticos antes de guardar
 chequeoSchema.pre('save', function(next) {
   // Calcular puntuación total si no existe
@@ -131,7 +110,7 @@ chequeoSchema.pre('save', function(next) {
   // Determinar resultado si no existe
   if (!this.resultado && this.puntuaciones.length === 8) { // Aseguro que hay 8 puntos de chequeo
     const total = this.puntuacion_total; // Obtengo la puntuación total
-    const minPuntuacion = Math.min(this.puntuaciones.map(p => p.valor)); // Obtengo la puntuación mínima entre los puntos de chequeo
+    const minPuntuacion = Math.min(...this.puntuaciones.map(p => p.valor)); // Obtengo la puntuación mínima entre los puntos de chequeo
     
     if (total >= 80) {
       this.resultado = 'Aprobado';
@@ -151,9 +130,13 @@ chequeoSchema.pre('save', function(next) {
 });
 
 // Middleware para actualizar el estado del turno después de guardar
-chequeoSchema.post('save', async function() { // Después de guardar el chequeo
-  const Turno = mongoose.model('Turno'); // Obtengo el modelo de Turno
-  await Turno.findByIdAndUpdate(this.turno, { estado: 'Completado' }); // Actualizo el estado del turno a 'Completado'
+chequeoSchema.post('save', async function() {
+  try {
+    const Turno = mongoose.model('Turno');
+    await Turno.findByIdAndUpdate(this.turno, { estado: 'Completado' });
+  } catch (error) {
+    console.log('Error al actualizar estado del turno:', error.message);
+  }
 });
 
 // Métodos de instancia
@@ -191,5 +174,4 @@ chequeoSchema.methods.toJSON = function() { // Defino un método toJSON en el es
   return chequeo;
 }; // Defino un método toJSON en el esquema para personalizar la conversión a JSON, eliminando los campos _id y __v, y agregando un campo 'id' con el valor de '_id'
 
-export const PuntoChequeo = mongoose.model('PuntoChequeo', puntoChequeoSchema); // Exporto el modelo de PuntoChequeo para usarlo en otras partes de la aplicación
-export default mongoose.model('Chequeo', chequeoSchema); // Exporto el modelo de Chequeo para usarlo en otras partes de la aplicación
+module.exports = mongoose.model('Chequeo', chequeoSchema); // Exporto el modelo de Chequeo para usarlo en otras partes de la aplicación

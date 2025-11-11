@@ -1,4 +1,4 @@
-import mongoose from "mongoose"; // Importo mongoose para definir el esquema y modelo de la colección de turnos
+const mongoose = require("mongoose"); // Importo mongoose para definir el esquema y modelo de la colección de turnos
 
 const turnoSchema = new mongoose.Schema( // Defino el esquema de la colección de turnos
     {
@@ -35,12 +35,6 @@ const turnoSchema = new mongoose.Schema( // Defino el esquema de la colección d
     },
     { Timestamps: true } // Los Habilito para que mongoose agregue automáticamente los campos 'createdAt' y 'updatedAt', para segumiento de cambios
 );
-
-turnoSchema.index({ estado: 1 }); // Creo un índice en el campo 'estado' para mejorar el rendimiento de las consultas que lo utilicen
-turnoSchema.index({ fecha: 1 }); // Creo un índice en el campo 'fecha' para mejorar el rendimiento de las consultas que lo utilicen
-turnoSchema.index({ vehiculo: 1 }); // Creo un índice en el campo 'vehiculo' para mejorar el rendimiento de las consultas que lo utilicen
-turnoSchema.index({ fecha: 1, vehiculo: 1 }, { unique: true });
-// Creo un índice compuesto único en los campos 'fecha' y 'vehiculo' para evitar que se creen turnos duplicados para el mismo vehículo en la misma fecha y hora
 
 turnoSchema.methods.puedeConfirmar = function() { // Método para verificar si el turno puede ser confirmado
   return this.estado === 'Pendiente'; // Solo se puede confirmar si el estado es 'PENDIENTE'
@@ -82,5 +76,5 @@ turnoSchema.methods.toJSON = function() { // Defino un método toJSON en el esqu
 };
 // Defino un método toJSON en el esquema para personalizar la conversión a JSON, eliminando los campos _id y __v, y agregando un campo 'id' con el valor de '_id'
 
-export default mongoose.model("Turno", turnoSchema); 
+module.exports = mongoose.model("Turno", turnoSchema); 
 // Exporto el modelo de la colección de turnos, que se llamará "Turno" y usará el esquema definido anteriormente

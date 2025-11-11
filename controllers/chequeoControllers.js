@@ -1,6 +1,6 @@
-import ChequeoService from './services/chequeoService.js';
-import ChequeoRepository from './repositories/chequeoRepositorio.js';
-import TurnoRepository from './repositories/turnoRepositorio.js';
+const ChequeoService = require('../services/chequeoService.js');
+const ChequeoRepository = require('../repositories/chequeoRepositorio.js');
+const TurnoRepository = require('../repositories/turnoRepositorio.js');
 
 // Inyección de dependencias
 const chequeoRepository = new ChequeoRepository();
@@ -26,6 +26,16 @@ class ChequeoController { // Controlador para manejar las rutas de chequeos
         });
       }
 
+       // Validar rango de puntuaciones (1-10)
+      for (let i = 0; i < puntuaciones.length; i++) {
+        if (puntuaciones[i] < 1 || puntuaciones[i] > 10) {
+          return res.status(400).json({
+            success: false,
+            message: `La puntuación ${i + 1} debe estar entre 1 y 10`
+          });
+        }
+      }
+
       const datosChequeo = { // Estructura de datos para el chequeo
         turno,
         tecnico,
@@ -39,6 +49,12 @@ class ChequeoController { // Controlador para manejar las rutas de chequeos
       };
 
       const chequeo = await chequeoService.realizarChequeo(datosChequeo); // Llamada al servicio para realizar el chequeo
+
+        // Informar observaciones automáticas
+      let mensaje = 'Chequeo realizado exitosamente';
+      if (chequeo.resultado === 'Rechequeo') {
+        mensaje += '. El vehículo requiere rechequeo.';
+      }
 
       res.status(201).json({ // Respuesta exitosa
         success: true,
@@ -204,4 +220,4 @@ class ChequeoController { // Controlador para manejar las rutas de chequeos
   }
 }
 
-export default new ChequeoController(); // Exportar una instancia del controlador
+module.exports = new ChequeoController(); // Exportar una instancia del controlador

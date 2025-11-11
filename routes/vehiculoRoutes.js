@@ -1,6 +1,6 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import vehiculoController from './controllers/vehiculoControllers.js';
+const vehiculoController = require('../controllers/vehiculoControllers.js');
 
 // GET /api/vehiculos - Listar todos los vehículos
 router.get('/', vehiculoController.listarVehiculos);
@@ -23,4 +23,4 @@ router.put('/:id', vehiculoController.actualizarVehiculo);
 // DELETE /api/vehiculos/:id - Eliminar vehículo
 router.delete('/:id', vehiculoController.eliminarVehiculo);
 
-export default router;
+module.exports = router;

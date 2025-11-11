@@ -1,5 +1,5 @@
-import TurnoRepository from './repositories/turnoRepositorio.js';
-import Vehiculo from './models/vehiculo.js';
+const TurnoRepository = require('../repositories/turnoRepositorio.js');
+const Vehiculo = require('../models/vehiculo.js');
 
 class TurnoService {
   constructor(turnoRepository) {
@@ -22,7 +22,7 @@ class TurnoService {
         throw new Error('Ya existe un turno programado para este vehículo en la fecha seleccionada');
       }
       
-      const turno = await this.turnoRepository.guardar(datosTurno); // Guardar el nuevo turno
+      const turno = await this.turnoRepository.crear(datosTurno); // Guardar el nuevo turno
       
       return turno; // Retornar el turno creado
       
@@ -38,7 +38,7 @@ class TurnoService {
         throw new Error('Turno no encontrado');
       }
       
-      if (!turno.puedeConfirmar()) {
+      if (turno.estado !== 'Pendiente') {
         throw new Error('El turno no puede ser confirmado en su estado actual');
       }
       
@@ -61,7 +61,7 @@ class TurnoService {
         throw new Error('Turno no encontrado');
       }
       
-      if (!turno.puedeCancelar()) {
+      if (turno.estado !== 'Pendiente' && turno.estado !== 'Confirmado') {
         throw new Error('El turno no puede ser cancelado en su estado actual');
       }
       
@@ -102,4 +102,4 @@ class TurnoService {
   }
 }
 
-export default TurnoService; // Exportar la clase para su uso en otros módulos
+module.exports = TurnoService; // Exportar la clase para su uso en otros módulos
